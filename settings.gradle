@@ -1,0 +1,3 @@
+rootProject.name = "AntManPlugin"
+include ':app'
+include ':ant_man_plugin'

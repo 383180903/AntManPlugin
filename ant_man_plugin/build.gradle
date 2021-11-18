@@ -1,0 +1,47 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'kotlin'//由于插件使用的是kotlin开发，需要引入kotlin插件
+
+buildscript {
+    ext.kotlin_version = '1.5.21'
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+dependencies {
+    implementation gradleApi() //gradle sdk
+    implementation localGroovy() //groovy sdk
+    implementation 'com.android.tools.build:gradle:4.2.1'  //需要用到gradle的Api，需要引入
+}
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'org.javassist:javassist:3.20.0-GA'//插桩框架
+}
+
+//以下是为了插件发布准备的一些配置
+def group='com.wxf.plugin' //组
+def version='1.1.0' //版本
+def artifactId='ant-man' //唯一标示
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            //本地的Maven地址设置
+            pom.groupId = group
+            pom.artifactId = artifactId
+            pom.version = version
+            repository(url: uri('../asm_repo'))
+        }
+    }
+}
