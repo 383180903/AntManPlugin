@@ -4,6 +4,8 @@ import com.wxf.ant_man_plugin.configext.AntManConfigExtension
 import com.wxf.ant_man_plugin.extensions.android
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.ProjectEvaluationListener
+import org.gradle.api.ProjectState
 
 
 /**
@@ -20,15 +22,24 @@ class AntManPlugin : Plugin<Project> {
         println("********************************")
 
         val config = project.extensions.create("antManConfig", AntManConfigExtension::class.java)
-        println("********************************")
-        if (config.isNeedOpenPlugin()) {
-            if (config.isHookSensor == true) {
-                println("***** hook sensor mission start *****")
-                project.android.registerTransform(AntManTransform(project))
+        project.gradle.addProjectEvaluationListener(object : ProjectEvaluationListener {
+            override fun beforeEvaluate(p0: Project) {
+                println("*************** beforeEvaluate *****************")
             }
-        } else {
-            println("***** no mission *****")
-        }
-        println("********************************")
+
+            override fun afterEvaluate(p0: Project, p1: ProjectState) {
+                println("*************** afterEvaluate *****************")
+                println("********************************")
+                if (config.isNeedOpenPlugin()) {
+                    if (config.isHookSensor == true) {
+                        println("***** hook sensor mission start *****")
+                        project.android.registerTransform(AntManTransform(project))
+                    }
+                } else {
+                    println("***** no mission *****")
+                }
+                println("********************************")
+            }
+        })
     }
 }
