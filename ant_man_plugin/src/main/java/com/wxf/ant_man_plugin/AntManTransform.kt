@@ -70,7 +70,7 @@ class AntManTransform constructor(var project: Project) : Transform() {
             println("***********************************")
             it.jarInputs.forEach { jarInput ->
                 pool.addPathJarInput(jarInput)
-                var jarName = jarInput.file.name
+                var jarName = jarInput.name
                 if (!JarOutputManager.checkJarExists(jarName) || jarInput.status == Status.CHANGED) {
                     "$jarName need copy to output area".print()
                     "$jarName state:${jarInput.status}".print()
