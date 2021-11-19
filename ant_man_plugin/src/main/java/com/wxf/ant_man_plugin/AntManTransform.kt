@@ -4,7 +4,6 @@ import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.android.utils.FileUtils
 import com.wxf.ant_man_plugin.extensions.*
-import com.wxf.ant_man_plugin.helper.ClassPathHelper
 import com.wxf.ant_man_plugin.helper.ClazzOperateHelper
 import com.wxf.ant_man_plugin.manager.JarOutputManager
 import javassist.ClassPool
@@ -23,17 +22,10 @@ class AntManTransform constructor(var project: Project) : Transform() {
     companion object {
         const val TARGET_JAR_NAME = "SensorsAnalyticsSDK"
         const val TARGET_FILE = "AopUtil"
-        const val TARGET_METHOD = "getViewId"
         const val INSERT_BEFORE = "int id = $1.getId();\n" +
                 "        if ((id & 0xFF000000) == 0 && (id & 0x00FFFFFF) != 0){\n" +
                 "            return null;\n" +
                 "        }"
-    }
-
-    private val pool: ClassPool by lazy {
-        ClassPool(true).apply {
-            addPathProject(project)
-        }
     }
 
     override fun getName(): String = AntManTransform::class.java.simpleName
@@ -48,33 +40,28 @@ class AntManTransform constructor(var project: Project) : Transform() {
 
     override fun transform(transformInvocation: TransformInvocation?) {
         super.transform(transformInvocation)
-        println("*******************************************")
-        println("********* AntManTransform start ***********")
-        println("*******************************************")
+        "*******************************************".print()
+        "********* AntManTransform start ***********".print()
+        "*******************************************".print()
         val startTime = System.currentTimeMillis()
 
         if (transformInvocation?.isIncremental?.not() == true) {
-            println("******** not incremental ************")
+            "******** not incremental ************".print()
             transformInvocation.outputProvider?.deleteAll()
             JarOutputManager.clearAll()
         }
 
-        project.android.bootClasspath.forEach {
-            pool.appendClassPath(it.absolutePath)
-        }
-
         transformInvocation?.inputs?.forEach {
             //遍历jar包
-            println("***********************************")
-            println("*******    foreach jar    ********")
-            println("***********************************")
+            "***********************************".print()
+            "*******    foreach jar    ********".print()
+            "***********************************".print()
             it.jarInputs.forEach { jarInput ->
-                pool.addPathJarInput(jarInput)
                 var jarName = jarInput.name
                 if (!JarOutputManager.checkJarExists(jarName) || jarInput.status == Status.CHANGED) {
                     "$jarName need copy to output area".print()
                     "$jarName state:${jarInput.status}".print()
-                    if (JarOutputManager.checkJarExists(jarName) && jarInput.status == Status.CHANGED){
+                    if (JarOutputManager.checkJarExists(jarName) && jarInput.status == Status.CHANGED) {
                         //如果文件输出路径有一样名字的jar，现在出现更新，则必须把旧jar删除掉
                         safe {
                             "$jarName need delete overdue jar".print()
@@ -83,12 +70,9 @@ class AntManTransform constructor(var project: Project) : Transform() {
                     }
                     val dest: File = if (jarName.contains(TARGET_JAR_NAME)) {
                         val jarPath = jarInput.file.absolutePath
-                        ClazzOperateHelper.modifyTargetFileFromJar(
+                        ClazzOperateHelper.hookSensorTargetFile(
                             jarPath = jarPath,
-                            classPool = pool,
-                            targetClassName = TARGET_FILE,
-                            targetMethodName = TARGET_METHOD,
-                            targetMethodBefore = INSERT_BEFORE
+                            targetFileName = TARGET_FILE
                         )
                         val md5Name = DigestUtils.md5Hex(jarInput.file.absolutePath)
                         if (jarName.endsWith(CLASS_SUFFIX)) {
@@ -108,11 +92,10 @@ class AntManTransform constructor(var project: Project) : Transform() {
                 }
             }
             //遍历文件夹
-            println("****************************************")
-            println("*******    foreach directory    ********")
-            println("****************************************")
+            "****************************************".print()
+            "*******    foreach directory    ********".print()
+            "****************************************".print()
             it.directoryInputs.forEach { dirInput ->
-                pool.addPathDirInput(dirInput)
                 // 获取output目录
                 val dest = transformInvocation.outputProvider.getContentLocation(
                     dirInput.name,
@@ -126,11 +109,10 @@ class AntManTransform constructor(var project: Project) : Transform() {
                 }
             }
         }
-        ClassPathHelper.removeClassPath(pool)
         val cost = System.currentTimeMillis() - startTime
-        println("*******************************************")
-        println("********* AntManTransform finish **********")
-        println("********* total cost: ${cost}ms  **********")
-        println("*******************************************")
+        "*******************************************".print()
+        "********* AntManTransform finish **********".print()
+        "********* total cost: ${cost}ms  **********".print()
+        "*******************************************".print()
     }
 }

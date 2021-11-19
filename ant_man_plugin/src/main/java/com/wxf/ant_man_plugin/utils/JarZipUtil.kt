@@ -14,7 +14,7 @@ object JarZipUtil {
      *
      * @param jarPath     jar包的绝对路径
      * @param destDirPath jar包解压后的保存路径
-     * @return 返回该jar包中包含的所有class的完整类名类名集合 ，如com.xxx.yyy.XXClass.class
+     * @return 返回该jar包中包含的所有class的完整路径
      */
     fun unZipJar(jarPath: String, destDirPath: String): List<String> {
         val list: MutableList<String> = ArrayList()
@@ -29,8 +29,8 @@ object JarZipUtil {
                     }
                     val entryName = jarEntry.name
                     if (entryName.endsWith(CLASS_SUFFIX)) {
-                        val className = entryName.replace("\\", ".").replace("/", ".")
-                        list.add(className)
+//                        val className = entryName.replace("\\", ".").replace("/", ".")
+                        list.add(entryName)
                     }
                     val outFileName = "$destDirPath/$entryName"
                     val outFile = File(outFileName)

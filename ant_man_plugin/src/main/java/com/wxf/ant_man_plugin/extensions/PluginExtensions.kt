@@ -5,7 +5,6 @@ import com.android.build.api.transform.Format
 import com.android.build.api.transform.JarInput
 import com.android.build.api.transform.TransformOutputProvider
 import com.android.build.gradle.BaseExtension
-import com.wxf.ant_man_plugin.helper.ClassPathHelper
 import javassist.ClassPool
 import org.gradle.api.Project
 import java.io.File
@@ -17,28 +16,6 @@ import java.io.File
 const val JAR_SUFFIX = ".jar"
 const val CLASS_SUFFIX = ".class"
 
-/**
- * 添加android项目路径到ClassPool
- */
-fun ClassPool.addPathProject(project: Project) {
-    project.android.bootClasspath.forEach {
-        ClassPathHelper.appendClassPath(this, it.absolutePath)
-    }
-}
-
-/**
- * 添加jarInput路径到ClassPool
- */
-fun ClassPool.addPathJarInput(jarInput: JarInput) {
-    ClassPathHelper.insertClassPath(this, jarInput.file.absolutePath)
-}
-
-/**
- * 添加dirInput路径到ClassPool
- */
-fun ClassPool.addPathDirInput(dirInput: DirectoryInput) {
-    ClassPathHelper.insertClassPath(this, dirInput.file.absolutePath)
-}
 
 val Project.android: BaseExtension
     get() = extensions.getByType(BaseExtension::class.java)
