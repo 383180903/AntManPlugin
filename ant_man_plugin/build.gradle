@@ -27,6 +27,19 @@ repositories {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'org.javassist:javassist:3.20.0-GA'//插桩框架
+
+    //包中定义类基于核心 API 的相关操作类
+    //包中定义了核心 API 的类，其中 ClassVisitor、FieldVisitor、MethodVisitor 和 AnnotationVisitor
+    // 四个抽象类，用于访问 .class 字节码文件中的 fields、 methods 和 annotations 相关的指令。
+    implementation 'org.ow2.asm:asm:7.1'
+    //包中提供了实用的类或方法的 Adapter 方法转换器；
+    implementation 'org.ow2.asm:asm-commons:7.1'
+    //包中提供了常见的类分析框架和分析器类；
+    implementation 'org.ow2.asm:asm-analysis:7.1'
+    //包中提供了基于核心 API 的常见工具类。
+    implementation 'org.ow2.asm:asm-util:7.1'
+    //包中定义了基于树 API 的类，以及一些用于事件和树 API 转换的工具类；
+    implementation 'org.ow2.asm:asm-tree:7.1'
 }
 
 //以下是为了插件发布准备的一些配置
