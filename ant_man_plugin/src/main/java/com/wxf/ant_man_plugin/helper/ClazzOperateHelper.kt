@@ -1,12 +1,9 @@
 package com.wxf.ant_man_plugin.helper
 
-import com.wxf.ant_man_plugin.asm_visitor.clazz_visitor.SensorClazzVisitor
-import com.wxf.ant_man_plugin.extensions.CLASS_SUFFIX
 import com.wxf.ant_man_plugin.extensions.JAR_SUFFIX
 import com.wxf.ant_man_plugin.extensions.print
 import com.wxf.ant_man_plugin.manager.AsmHookManager
 import com.wxf.ant_man_plugin.utils.JarZipUtil
-import javassist.ClassPool
 import org.apache.commons.io.FileUtils
 import java.io.File
 

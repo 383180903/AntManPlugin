@@ -1,11 +1,9 @@
 package com.wxf.ant_man_plugin.extensions
 
-import com.android.build.api.transform.DirectoryInput
 import com.android.build.api.transform.Format
 import com.android.build.api.transform.JarInput
 import com.android.build.api.transform.TransformOutputProvider
 import com.android.build.gradle.BaseExtension
-import javassist.ClassPool
 import org.gradle.api.Project
 import java.io.File
 

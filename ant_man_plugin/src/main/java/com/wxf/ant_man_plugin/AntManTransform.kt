@@ -6,7 +6,6 @@ import com.android.utils.FileUtils
 import com.wxf.ant_man_plugin.extensions.*
 import com.wxf.ant_man_plugin.helper.ClazzOperateHelper
 import com.wxf.ant_man_plugin.manager.JarOutputManager
-import javassist.ClassPool
 import org.apache.commons.codec.digest.DigestUtils
 import org.gradle.api.Project
 import java.io.File
@@ -22,10 +21,6 @@ class AntManTransform constructor(var project: Project) : Transform() {
     companion object {
         const val TARGET_JAR_NAME = "SensorsAnalyticsSDK"
         const val TARGET_FILE = "AopUtil"
-        const val INSERT_BEFORE = "int id = $1.getId();\n" +
-                "        if ((id & 0xFF000000) == 0 && (id & 0x00FFFFFF) != 0){\n" +
-                "            return null;\n" +
-                "        }"
     }
 
     override fun getName(): String = AntManTransform::class.java.simpleName
