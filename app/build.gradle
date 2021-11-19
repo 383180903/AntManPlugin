@@ -33,7 +33,7 @@ android {
 }
 
 antManConfig {
-    isHookSensor = false
+    isHookSensor = true
 }
 
 dependencies {
