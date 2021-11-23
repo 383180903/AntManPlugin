@@ -38,6 +38,7 @@ class SensorMethodVisitor(api: Int, mv: MethodVisitor) :
         mv.visitInsn(Opcodes.ACONST_NULL)
         mv.visitInsn(Opcodes.ARETURN)
         mv.visitLabel(label2)
+        mv.visitLineNumber(16, label2)
         super.visitCode()
     }
 }
