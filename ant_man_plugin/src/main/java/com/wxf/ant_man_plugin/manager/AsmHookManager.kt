@@ -1,6 +1,8 @@
 package com.wxf.ant_man_plugin.manager
 
 import com.wxf.ant_man_plugin.asm_visitor.clazz_visitor.SensorClazzVisitor
+import com.wxf.ant_man_plugin.asm_visitor.clazz_visitor.ToastClazzVisitor
+import com.wxf.ant_man_plugin.extensions.CLASS_SUFFIX
 import com.wxf.ant_man_plugin.extensions.print
 import jdk.internal.org.objectweb.asm.ClassReader
 import jdk.internal.org.objectweb.asm.ClassVisitor
@@ -28,4 +30,23 @@ object AsmHookManager {
         fos.close()
         "${clazzFile.name} modify success".print()
     }
+
+    @JvmStatic
+    fun operateToastClazz(clazzFile: File) {
+        if (clazzFile.name.endsWith(CLASS_SUFFIX)){
+            val clazzReader = ClassReader(clazzFile.readBytes())
+            val clazzWriter = ClassWriter(clazzReader, ClassWriter.COMPUTE_MAXS)
+            val clazzVisitor = ToastClazzVisitor(clazzWriter = clazzWriter)
+            clazzReader.accept(clazzVisitor, ClassReader.EXPAND_FRAMES)
+            //覆盖原来的class文件
+            val code = clazzWriter.toByteArray()
+            val fos =
+                FileOutputStream(clazzFile.parentFile.absolutePath + File.separator + clazzFile.name)
+            fos.write(code)
+            fos.close()
+            "${clazzFile.name} modify success".print()
+        }
+    }
+
+
 }

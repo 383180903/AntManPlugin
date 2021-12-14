@@ -5,6 +5,7 @@ import com.android.build.gradle.internal.pipeline.TransformManager
 import com.android.utils.FileUtils
 import com.wxf.ant_man_plugin.extensions.*
 import com.wxf.ant_man_plugin.helper.ClazzOperateHelper
+import com.wxf.ant_man_plugin.manager.AsmHookManager
 import com.wxf.ant_man_plugin.manager.JarOutputManager
 import org.apache.commons.codec.digest.DigestUtils
 import org.gradle.api.Project
@@ -91,6 +92,10 @@ class AntManTransform constructor(var project: Project) : Transform() {
             "*******    foreach directory    ********".print()
             "****************************************".print()
             it.directoryInputs.forEach { dirInput ->
+                val dir = dirInput.file
+                dir?.let {
+                    scanFile(it)
+                }
                 // 获取output目录
                 val dest = transformInvocation.outputProvider.getContentLocation(
                     dirInput.name,
@@ -109,5 +114,20 @@ class AntManTransform constructor(var project: Project) : Transform() {
         "********* AntManTransform finish **********".print()
         "********* total cost: ${cost}ms  **********".print()
         "*******************************************".print()
+    }
+
+    private fun scanFile(dir: File) {
+        if (dir.isDirectory) {
+            dir.walk().forEach { f ->
+                if(f.isDirectory.not()){
+                    AsmHookManager.operateToastClazz(f)
+                }else{
+                    println("scanFile - isDirectory:${f.name}")
+                }
+            }
+        } else {
+            println("scanFile - fileName:${dir.name}")
+            AsmHookManager.operateToastClazz(dir)
+        }
     }
 }
