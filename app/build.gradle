@@ -2,7 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-android-extensions'
-    id 'com.sensorsdata.analytics.android'
+//    id 'com.sensorsdata.analytics.android'
     id 'com.wxf.plugin'
 }
 

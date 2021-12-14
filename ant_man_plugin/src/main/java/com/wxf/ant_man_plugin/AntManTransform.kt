@@ -41,17 +41,14 @@ class AntManTransform constructor(var project: Project) : Transform() {
         "*******************************************".print()
         val startTime = System.currentTimeMillis()
 
+        "******** is incremental - ${transformInvocation?.isIncremental} ************".print()
         if (transformInvocation?.isIncremental?.not() == true) {
-            "******** not incremental ************".print()
             transformInvocation.outputProvider?.deleteAll()
             JarOutputManager.clearAll()
         }
 
         transformInvocation?.inputs?.forEach {
             //遍历jar包
-            "***********************************".print()
-            "*******    foreach jar    ********".print()
-            "***********************************".print()
             it.jarInputs.forEach { jarInput ->
                 var jarName = jarInput.name
                 if (!JarOutputManager.checkJarExists(jarName) || jarInput.status == Status.CHANGED) {
@@ -88,25 +85,12 @@ class AntManTransform constructor(var project: Project) : Transform() {
                 }
             }
             //遍历文件夹
-            "****************************************".print()
-            "*******    foreach directory    ********".print()
-            "****************************************".print()
             it.directoryInputs.forEach { dirInput ->
-                val dir = dirInput.file
-                dir?.let {
-                    scanFile(it)
-                }
-                // 获取output目录
-                val dest = transformInvocation.outputProvider.getContentLocation(
-                    dirInput.name,
-                    dirInput.contentTypes,
-                    dirInput.scopes,
-                    Format.DIRECTORY
+                processDirectoryWithIncremental(
+                    dirInput,
+                    transformInvocation.outputProvider,
+                    transformInvocation.isIncremental
                 )
-                // 将input的目录复制到output指定目录
-                safe {
-                    FileUtils.copyDirectory(dirInput.file, dest)
-                }
             }
         }
         val cost = System.currentTimeMillis() - startTime
@@ -116,13 +100,63 @@ class AntManTransform constructor(var project: Project) : Transform() {
         "*******************************************".print()
     }
 
+    private fun processDirectoryWithIncremental(
+        dirInput: DirectoryInput,
+        outputProvider: TransformOutputProvider,
+        incremental: Boolean
+    ) {
+        val dir = dirInput.file
+        // 获取output目录
+        val dest = outputProvider.getContentLocation(
+            dirInput.name,
+            dirInput.contentTypes,
+            dirInput.scopes,
+            Format.DIRECTORY
+        )
+        // 将input的目录复制到output指定目录
+        if (incremental) {
+            FileUtils.mkdirs(dest)
+            //输入路径
+            val srcDirPath = dirInput.file.absolutePath
+            //输出路径
+            val destDirPath = dest.absolutePath
+            dirInput.changedFiles.forEach {
+                val inputFile = it.key
+                //找到输出路径的文件
+                val destFilePath = inputFile.absolutePath.replace(srcDirPath, destDirPath)
+                val destFile = File(destFilePath)
+                when (it.value) {
+                    Status.REMOVED -> {
+                        if (destFile.exists()) {
+                            println("REMOVED inputFilePath:${inputFile.absolutePath}")
+                            println("REMOVED destFilePath:${destFilePath}")
+                            FileUtils.deleteIfExists(destFile)
+                        }
+                    }
+                    Status.CHANGED, Status.ADDED -> {
+                        if (destFile.exists()) {
+                            FileUtils.deleteIfExists(destFile)
+                        }
+                        scanFile(inputFile)
+                    }
+                    Status.NOTCHANGED ->{
+                        println("NOT CHANGED file:${inputFile.absolutePath}")
+                    }
+                }
+            }
+        } else {
+            scanFile(dir)
+        }
+        safe {
+            FileUtils.copyDirectory(dirInput.file, dest)
+        }
+    }
+
     private fun scanFile(dir: File) {
         if (dir.isDirectory) {
             dir.walk().forEach { f ->
-                if(f.isDirectory.not()){
+                if (f.isDirectory.not()) {
                     AsmHookManager.operateToastClazz(f)
-                }else{
-                    println("scanFile - isDirectory:${f.name}")
                 }
             }
         } else {
